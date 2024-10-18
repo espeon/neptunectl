@@ -7,6 +7,7 @@ use tracing_subscriber::EnvFilter;
 mod helpers;
 mod install;
 mod uninstall;
+mod progress;
 
 /// A CLI tool to manage Neptune on your system
 #[derive(Parser, Debug)]
@@ -25,6 +26,8 @@ enum Commands {
     Uninstall(UninstallOpts),
 }
 
+const INSTALL_PATH_HELP: &str = "The installation directory where app.asar or original.asar is found. Typically found in TIDAL\\app-x.xx.x\\resources";
+
 #[derive(Parser, Debug, Clone)]
 struct InstallOpts {
     #[clap(
@@ -37,7 +40,7 @@ struct InstallOpts {
     #[clap(
         long,
         default_value = None,
-        help = "The installation directory where app.asar or original.asar is found."
+        help = INSTALL_PATH_HELP
     )]
     install_path: Option<PathBuf>,
 }
@@ -53,7 +56,7 @@ struct UninstallOpts {
     #[clap(
         long,
         default_value = None,
-        help = "The installation directory where app.asar or original.asar is found."
+        help = INSTALL_PATH_HELP
     )]
     install_path: Option<PathBuf>,
 }
@@ -87,11 +90,7 @@ fn run() -> anyhow::Result<()> {
 
     match args.command {
         Commands::Install(opts) => install::Installer::new(opts)?.init(),
-        Commands::Uninstall(opts) => uninstall::Uninstaller::new(opts)?.init(),
-        _ => {
-            println!("You may want to specify a command.");
-            Ok(())
-        },
+        Commands::Uninstall(opts) => uninstall::Uninstaller::new(opts)?.init()
     }?;
 
     Ok(())
